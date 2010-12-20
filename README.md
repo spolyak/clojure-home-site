@@ -1,7 +1,7 @@
-Beget
+Steve Polyak website
 =====
 
-Sample Google App Engine project with Clojure and Leiningen.
+Website on Google App Engine project with Clojure and Leiningen.
 
 Usage
 =====
