@@ -26,4 +26,4 @@ Git
 =====
 
 	$ git commit -a -m "working on GAE datastore examples"
-	$ git remote
+	$ git push origin master 
