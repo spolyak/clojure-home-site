@@ -15,3 +15,7 @@
 
 (def index
      (layout "StevePolyak" [:p "Steve Polyak's homesite"]))
+
+(def new-blog
+     (layout "Enter Blog" [:p "New Blog"]))
+
