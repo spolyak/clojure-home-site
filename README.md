@@ -21,3 +21,9 @@ https://appengine.google.com/
 
 site location: 
 http://stevepolyakmac.appspot.com/
+
+Git 
+=====
+
+	$ git commit -a -m "working on GAE datastore examples"
+	$ git remote
