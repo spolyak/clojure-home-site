@@ -4,7 +4,7 @@
         [ring.util.servlet   :only [defservice]]
         [ring.util.response  :only [redirect]]
         [hiccup.core         :only [h html]]
-        [hiccup.page-helpers :only [doctype include-css link-to xhtml-tag]]
+        [hiccup.page-helpers :only [doctype include-css link-to xhtml-tag url]]
         [hiccup.form-helpers :only [form-to text-area text-field]])
   (:import (com.google.appengine.api.datastore Query))
   (:require [compojure.route          :as route]
@@ -31,8 +31,8 @@
         [:li (link-to "/admin/new" "Create new post (Admin only)")])]
      [:h3 "External Links"]
      [:ul
-      [:li (link-to "http://compojureongae.posterous.com/" "Blog")]
-      [:li (link-to "http://github.com/christianberg/compojureongae" "Source Code")]]]))
+      [:li (link-to "http://stevepolyak.com/" "Blog")]
+      [:li (link-to "http://github.com/spolyak/clojure-home-site" "Source Code")]]]))
 
 (defn google-analytics [code]
   "Returns the script tag for injecting Google Analytics site visitor tracking."
@@ -56,7 +56,7 @@
                     [:title title]
                     (include-css "/css/main.css")]
                    [:body
-                    (google-analytics "UA-16545358-1")
+                    (google-analytics "UA-20477473-1")
                     [:h1 title]
                     [:div#main body]
                     (side-bar)])))
@@ -83,7 +83,8 @@
 (defn render-post [post]
   "Renders a post to HTML."
   [:div
-   [:h2 (h (:title post))]
+   [:h2 (h (:title post))
+    [:a {:href (url "/admin/delete" {:postkey (:key post)})} "[Delete]"]]
    [:p (h (:body post))]])
 
 (defn get-posts []
@@ -92,7 +93,7 @@
 
 (defn main-page []
   "Renders the main page by displaying all posts."
-  (render-page "Compojure on GAE"
+  (render-page "Steve Polyak Home Site"
     (map render-post (get-posts))))
 
 (defroutes public-routes
