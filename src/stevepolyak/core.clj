@@ -29,6 +29,7 @@
      [:h3 "Navigation"]
      [:ul
       [:li (link-to "/" "Main page")]
+      [:li (link-to "/info.html" "Info page")]
       (if (and (:user ui) (.isUserAdmin (:user-service ui)))
         [:li (link-to "/admin/new" "Create new post (Admin only)")])]
      [:h3 "External Links"]
@@ -126,6 +127,7 @@
 (defroutes example
   public-routes
   (ANY "/admin/*" [] admin-routes)
+  (route/files "/" {:root "./public"})
   (route/not-found "Page not found"))
 
 (defservice example)
