@@ -9,7 +9,9 @@
   (:import (com.google.appengine.api.datastore Query))
   (:require [compojure.route          :as route]
             [appengine.datastore.core :as ds]
-            [appengine.users          :as users]))
+	    [appengine.datastore.keys :as dsk]
+            [appengine.users          :as users]
+	    [ring.util.codec          :as c]))
 
 ;; A static HTML side bar containing some internal and external links
 (defn side-bar []
@@ -80,11 +82,16 @@
   (ds/create-entity {:kind "post" :title title :body body})
   (redirect "/"))
 
+(defn delete-post [postkey]
+  "Removes a post from postkey param and issues an HTTP Redirect to the main page."
+  (ds/delete-entity (ds/get-entity (dsk/string->key postkey)))
+  (redirect "/"))
+      
 (defn render-post [post]
   "Renders a post to HTML."
   [:div
    [:h2 (h (:title post))
-    [:a {:href (url "/admin/delete" {:postkey (:key post)})} "[Delete]"]]
+    [:a {:href (url "/admin/delete" {:postkey (dsk/key->string (:key post))})} "[Delete]"]]
    [:p (h (:body post))]])
 
 (defn get-posts []
@@ -101,6 +108,7 @@
 
 (defroutes admin-routes
   (GET  "/admin/new"  [] (render-page "New Post" new-form))
+  (GET  "/admin/delete"  [postkey] (delete-post postkey))
   (POST "/admin/post" [title body] (create-post title body)))
 
 (defn wrap-requiring-admin [application]
