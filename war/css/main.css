@@ -70,6 +70,17 @@ button {
     padding: .2em .5em;
     text-transform: uppercase;
 }
+#actions {
+    background: #ffd100;
+    border: 2px outset #333;
+    color: #333;
+    cursor: pointer;
+    font-size: .9em;
+    font-weight: bold;
+    letter-spacing: .3em;
+    padding: .2em .5em;
+    text-transform: uppercase;
+}
 #main {
     float: left;
     width: 600px;
