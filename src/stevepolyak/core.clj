@@ -7,11 +7,12 @@
         [hiccup.page-helpers :only [doctype include-css link-to xhtml-tag url]]
         [hiccup.form-helpers :only [form-to text-area text-field hidden-field]])
   (:import (com.google.appengine.api.datastore Query))
-  (:require [compojure.route          :as route]
-            [appengine.datastore.core :as ds]
-	    [appengine.datastore.keys :as dsk]
-            [appengine.users          :as users]
-	    [ring.util.codec          :as c]))
+  (:require [compojure.route           :as route]
+            [appengine.datastore.core  :as ds]
+	    [appengine.datastore.keys  :as dsk]
+            [clojure.contrib.lazy-seqs :as lzy]
+            [appengine.users           :as users]
+	    [ring.util.codec           :as c]))
 
 ;; A static HTML side bar containing some internal and external links
 (defn side-bar []
@@ -30,6 +31,7 @@
      [:ul
       [:li (link-to "/" "Main page")]
       [:li (link-to "/info.html" "Info page")]
+      [:li (link-to "/number/main" "Numbers")]
       (if (and (:user ui) (.isUserAdmin (:user-service ui)))
         [:li (link-to "/admin/new" "Create new post (Admin only)")])]
      [:h3 "External Links"]
@@ -92,6 +94,16 @@
                  (text-area :body (:body post))]]
 	       (hidden-field :postkey (dsk/key->string (:key post)))
                [:button {:type "submit"} "Post!"]])))
+
+(defn number-form []
+     (form-to [:post "/number/primes"]
+              [:fieldset
+               [:legend "Take primes"]
+               [:ol
+                [:li
+                 [:label {:for :title} "How many"]
+                 (text-field :count "1")]]
+               [:button {:type "submit"} "Generate!"]]))
           
 (defn create-post [title body]
   "Stores a new post in the datastore and issues an HTTP Redirect to the main page."
@@ -124,6 +136,10 @@
         (render-post-admin-links post))   
      [:p (h (:body post))]]))
 
+(defn render-number [number]
+  "Renders a number to HTML in a list."
+   [:li number])
+
 (defn get-posts []
   "Returns all posts stored in the datastore."
   (ds/find-all (Query. "post")))
@@ -133,8 +149,19 @@
   (render-page "Steve Polyak Home Site"
     (map render-post (get-posts))))
 
+(defn primes-page [count]
+  "Renders the numbers page to take seqs of numbers."
+  (render-page "Steve Polyak Home Site"
+    [:div 
+     [:h2 "Primes"]
+     [:ul (map render-number (take (Integer. count) lzy/primes))]]))
+
 (defroutes public-routes
   (GET "/" [] (main-page)))
+
+(defroutes number-routes
+  (GET "/number/main" [] (render-page "Number Form" (number-form)))
+  (POST "/number/primes" [count] (primes-page count)))
 
 (defroutes admin-routes
   (GET  "/admin/new"  [] (render-page "New Post" new-form))
@@ -157,6 +184,7 @@
 
 (defroutes example
   public-routes
+  (ANY "/number/*" [] number-routes)
   (ANY "/admin/*" [] admin-routes)
   (route/files "/" {:root "./public"})
   (route/not-found "Page not found"))
